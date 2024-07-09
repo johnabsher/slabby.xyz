@@ -1,5 +1,5 @@
-name: GCS Upload
-run-name: ${{ github.actor }} is uploading to GCS 🚀
+name: Build & Deploy
+run-name: ${{ github.actor }}:${{ github.run_number }} Build & Deploy to GCS 🚀
 on:
     push:
       branches:
