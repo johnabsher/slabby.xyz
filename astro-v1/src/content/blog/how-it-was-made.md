@@ -52,4 +52,4 @@ Currently the stack is:
 * [Astro](https://astro.build/) for Static Site Generation
 
 I'm pretty happy with it so far - it's lightning fast and easy to work with. I have very limited Astro experience - time
-will tell if that's what I want to stay with.:w
+will tell if that's what I want to stay with.
