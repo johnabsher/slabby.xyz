@@ -13,42 +13,42 @@ permissions:
     id-token: write
 
 jobs:
-    build:
+    build-deploy:
         runs-on: ubuntu-latest
+        permissions:
+            contents: 'read'
+            id-token: 'write'
         steps:
           - name: Checkout your repository using git
             uses: actions/checkout@v4
-          - name: Install, build, and upload your site
-            uses: withastro/action@v2
+          - name: Setup Node
+            uses: actions/setup-node@v4
             with:
-              path: astro-v1/ # The root location of your Astro project inside the repository. (optional)
-              # node-version: 20 # The specific version of Node that should be used to build your site. Defaults to 20. (optional)
-              # package-manager: pnpm@latest # The Node package manager that should be used to install dependencies and build your site. Automatically detected based on your lockfile. (optional)
-
-    upload-to-gcs:
-      permissions:
-        contents: 'read'
-        id-token: 'write'
-
-      runs-on: 'ubuntu-latest'
-  
-      steps:
-      - id: 'checkout'
-        uses: 'actions/checkout@v4'
-  
-      - id: 'auth'
-        uses: 'google-github-actions/auth@v2'
-        with:
-          credentials_json: '${{ secrets.GCS_CREDENTIALS }}'
-          # project_id: 'slabby-xyz-site'
-          # workload_identity_provider: 'projects/396362042427/locations/global/workloadIdentityPools/github/providers/slabby-xyz'
-            # 'projects/396362042427/locations/global/workloadIdentityPools/github'
-          # projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
-          # service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
-  
-      - id: 'upload-folder'
-        uses: 'google-github-actions/upload-cloud-storage@v2'
-        with:
-          path: 'astro-v1/dist'
-          destination: 'slabby.xyz'
-          parent: false
+              node-version: '20.x'
+              cache: npm
+              cache-dependency-path: "astro-v1/package-lock.json"
+              registry-url: 'https://registry.npmjs.org'
+          - name: Install & Build
+            id: build
+            shell: "bash"
+            working-directory: astro-v1/
+            run: |
+                npm install
+                npm run build
+          - name: Authenticate with Google Cloud
+            id: 'auth'
+            uses: 'google-github-actions/auth@v2'
+            with:
+                credentials_json: '${{ secrets.GCS_CREDENTIALS }}'
+                # project_id: 'slabby-xyz-site'
+                # workload_identity_provider: 'projects/396362042427/locations/global/workloadIdentityPools/github/providers/slabby-xyz'
+                    # 'projects/396362042427/locations/global/workloadIdentityPools/github'
+                # projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
+                # service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
+          - name: Upload compiled files to GCS
+            id: 'upload-folder'
+            uses: 'google-github-actions/upload-cloud-storage@v2'
+            with:
+                path: 'astro-v1/dist'
+                destination: 'slabby.xyz'
+                parent: false
