@@ -27,7 +27,7 @@ jobs:
             shell: "bash"
             working-directory: astro-v1/
             run: |
-                npm install
+                npm ci
                 npm run build
           - name: Authenticate with Google Cloud
             id: 'auth'
