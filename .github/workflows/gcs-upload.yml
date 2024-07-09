@@ -39,5 +39,8 @@ jobs:
                     # 'projects/396362042427/locations/global/workloadIdentityPools/github'
                 # projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider'
                 # service_account: 'my-service-account@my-project.iam.gserviceaccount.com'
-          - run: gcloud auth
-          - run: gsutil -m rsync -d -r astro-v1/dist gs://slabby.xyz
+          - name: 'Set up Cloud SDK'
+            uses: 'google-github-actions/setup-gcloud@v2'
+          - name: 'Upload to GCS'
+            id: deploy
+            run: gsutil -m rsync -d -r astro-v1/dist gs://slabby.xyz
